@@ -14,6 +14,7 @@ const CategoryPage = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const location = useLocation();
   // if location.state is not undefined, then we are in compare mode and it stores the product we want to compare to
+  
   const isCompareMode = useRef(!!location.state);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const CategoryPage = () => {
               product={product}
               navigateToOnClick={
                 isCompareMode.current
-                  ? `/compare/${location.state._id}/${product.id}`
+                  ? `/store/compare/${location.state.id}/${product.id}`
                   : undefined
               }
             />

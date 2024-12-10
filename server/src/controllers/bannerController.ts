@@ -6,6 +6,7 @@ import bannerService from "../services/bannerService.js";
 
 const getBannersSide = async (_req: Request, res: Response) => {  
   try {
+    console.log('controller banner side get in controll');
     const banner = await bannerService.getSideBannersFromBannerTeam();
     res.json(banner);
     console.log('controll');
@@ -26,9 +27,9 @@ const getBannersTop = async (_req: Request, res: Response) => {
 }
   
 const getBannersAll = async (req :Request, res:Response) => { 
+    console.log('controller banner',req.params);
   const {userID} = req.params
     const top5Products = await bannerService.getAllBanners( userID);
-    console.log('controll');
     res.json(top5Products);
   }
 

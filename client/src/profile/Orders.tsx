@@ -4,21 +4,25 @@ import { GetOrderInterface, OrderInterface } from '../types/order';
 import { Product } from '../types/Product';
 import { UserContext } from '../UserContext';
 
+const api = import.meta.env.VITE_API_URI
+
+
 export default function Orders() {
-  const [orders, setOrders] = useState<GetOrderInterface[] | null>(null); 
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [orders, setOrders] = useState<GetOrderInterface[]>(); 
+  const [loading, setLoading] = useState<boolean>(false);  
   const context = useContext(UserContext)!;
   const { userInfo } = context;
   const userId = userInfo?.id;
 
   async function getOrders(userId: string | undefined) {
     try {
-      const response = await fetch(`api/orders${userId}`);
+      const response = await fetch(`${api}/orders/allOrders/${userId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch orders');
       }
       const data = await response.json();
       setOrders(data);
+      setLoading(true);
     } catch (error) {
       console.error('Error fetching orders:', error);
       setOrders([]); 
@@ -52,7 +56,7 @@ export default function Orders() {
                   >
                     <img src={product.image.url} alt={product.name} style={{ width: '100px' }} />
                     <Typography variant="h5">{product.name}</Typography>
-                    <Typography variant="h5">{product.salePrice}</Typography>
+                    <Typography variant="h5">{product.saleprice}</Typography>
                     <Typography variant="h5">{product.quantity}</Typography>
                   </Box>
                 ))}
@@ -62,7 +66,6 @@ export default function Orders() {
         </Card>
       ) : (
         <Typography variant="h6">No orders available</Typography>
-        // Rendering if orders are null, empty, or fetching failed
       )}
     </>
   );

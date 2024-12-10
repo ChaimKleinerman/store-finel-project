@@ -8,14 +8,18 @@ import DialogTitle from '@mui/material/DialogTitle';
 import RadioGroupRating from './RadioGroupRating';
 import { Typography } from '@mui/material';
 import productsAPI from '../api/productsAPI';
+import { UserContext } from '../UserContext';
+import { useContext } from 'react';
 
 interface DialogReviewProps {
-  // Add any props if needed
+  pid: string | undefined;
+  updateReviews: () => void; // New prop for updating reviews
 }
-interface DialogReviewProps {
-    pid: string|undefined;
-    }
-const DialogReview: React.FC<DialogReviewProps> = ({pid}:DialogReviewProps) => {
+
+const DialogReview: React.FC<DialogReviewProps> = ({ pid, updateReviews }: DialogReviewProps) => {
+  const name = localStorage.getItem('name');
+  const context = useContext(UserContext)!;
+  const { userInfo } = context;
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [review, setReview] = useState('');
@@ -37,21 +41,18 @@ const DialogReview: React.FC<DialogReviewProps> = ({pid}:DialogReviewProps) => {
     setReview(event.target.value);
   };
 
-  
-
   const handleSubmit = async () => {
-   try{
-    setOpen(false)
-    const userReview = await productsAPI.sendReviewToDB(pid as string, title, review, rating,'moshe','agever');
-    console.log('this is user review',userReview);
-   ;   }
-    catch(error){
-        console.log('this is error',error);
+    try {
+      setOpen(false);
+      const userReview = await productsAPI.sendReviewToDB(pid || '', title, review, rating, name || '', userInfo?.id || '');
+      console.log('this is user review', userReview);
+      updateReviews(); // Call the updateReviews function to trigger a re-render in ProductPage
+    } catch (error) {
+      console.log('this is error', error);
     }
-  }
-  
-  console.log('this is rating',rating);
-  
+  };
+
+  console.log('this is rating', rating);
 
   return (
     <>
@@ -62,6 +63,7 @@ const DialogReview: React.FC<DialogReviewProps> = ({pid}:DialogReviewProps) => {
         <DialogTitle>Review</DialogTitle>
         <DialogContent>
           <TextField
+            required
             autoFocus
             margin="dense"
             id="title"
@@ -73,6 +75,7 @@ const DialogReview: React.FC<DialogReviewProps> = ({pid}:DialogReviewProps) => {
             onChange={handleTitleChange}
           />
           <TextField
+            required
             autoFocus
             margin="dense"
             id="review"
@@ -90,7 +93,7 @@ const DialogReview: React.FC<DialogReviewProps> = ({pid}:DialogReviewProps) => {
           <Typography variant="h6" component="div" sx={{ marginRight: 2 }}>
             Rating
           </Typography>
-          <RadioGroupRating setRating={setRating}/>
+          <RadioGroupRating setRating={setRating} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

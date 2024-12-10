@@ -34,7 +34,7 @@ export interface ShippingDetailsType {
 export interface OrderInterface {
     cartItems?: Product[] | [];
     userId: string;
-    orderTime: Date;
+    orderTime:Date;
     userName?: string;
     userEmail?: string;
     status: OrderStatusEnum;

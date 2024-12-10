@@ -2,8 +2,7 @@ import { Paper, Typography, Link, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import categoriesAPI from '../api/categoriesAPI';
 import Category from '../types/Category';
-
-
+import {v4 as uuidv4  } from "uuid";
 
 export default function CategoryNav() {
   const theme = useTheme();
@@ -15,7 +14,6 @@ export default function CategoryNav() {
       .then((categories) => setCategories(categories))
       .catch((err) => console.log(err));
   }, []);
-
   return (
     <Paper
       elevation={2}
@@ -33,11 +31,11 @@ export default function CategoryNav() {
             : theme.palette.background.default,
       }}
     >
-      {categories.map((category) => (
+      {categories.slice(0,4).map((category) => (
         <Link
-          href={`/category/${category.name}`}
+          href={`/store/category/${category.name}`}
           underline="none"
-          key={category._id}
+          key={uuidv4()}
           sx={{
             margin: 0.5,
             padding: 1,

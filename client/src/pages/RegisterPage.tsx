@@ -2,10 +2,31 @@ import { Avatar, Box, Button, Container, CssBaseline, Grid, Link, TextField, Typ
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import ROUTES from '../routes/routesModel';
 import { FormEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import { isValidEmail, isValidPassword } from '../utils/validationUtils';
 import userAPI from '../api/usersAPI';
 import { toastError, toastSuccess } from '../utils/toastUtils';
+import emailjs from '@emailjs/browser';
+// import { link } from 'fs/promises';
+// import { OverridableComponent } from '@mui/material/OverridableComponent';
+
+type templateEmail = {
+  email: string,
+  contact: JSX.Element,
+};
+
+
+const sendEmail = (templateParams: templateEmail) => {
+  emailjs.send('service_d2uwcc5', 'template_oty3bz9', templateParams, '4p9BnZQHweWrwmlDw', )
+    .then(function (response) {
+      console.log('SUCCESS!', response.status, response.text);
+    }, function (err) {
+      console.log('FAILED...', err);
+    });
+}
+
+// const storeEmail = 
+
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailError, setEmailError] = useState(false);
@@ -35,25 +56,33 @@ const RegisterPage = () => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = data.get('email') || '';
+    const name = data.get('name') || '';
     const password = data.get('password') || '';
     const confirmPassword = data.get('confirmPassword') || '';
-    if(password !== confirmPassword){
+    if (password !== confirmPassword) {
       toastError("Passwords do not match");
       return
     }
-    if(!isValidEmail(email.toString())){
+    if (!isValidEmail(email.toString())) {
       toastError("Email must be a valid email");
       return
     }
-    if(!isValidPassword(password.toString())){
+    if (!isValidPassword(password.toString())) {
       toastError("Password must be a valid password")
       return
     }
     try {
       setIsLoading(true);
-      await userAPI.register(email.toString(), password.toString() );
+      const res = await userAPI.register(email.toString(), password.toString(),name.toString());
+        console.log('this res of register',res);
+        localStorage.setItem('name', res.name);
       setIsLoading(false);
       toastSuccess("Register success");
+      const templateParams = {
+        email: String(email),
+        "contact": <link href={"class4store@gmail.com"}>contact us</link>
+      };
+      sendEmail(templateParams)
       navigate(ROUTES.LOGIN);
     } catch (err) {
       setIsLoading(false);
@@ -61,6 +90,7 @@ const RegisterPage = () => {
     }
   };
   return (
+    <>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -79,6 +109,15 @@ const RegisterPage = () => {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="name"
+                  label="name"
+                  name="name"
+                />
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   onBlur={handleEmailBlur}
@@ -127,12 +166,12 @@ const RegisterPage = () => {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-             Register
+              Register
             </Button>
             {isLoading && <p>Loading...</p>}
             <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href={ROUTES.LOGIN} variant="body2">
+              <Grid item >
+                <Link href={ROUTES.LOGIN} variant="body2" >
                   Already have an account? Login
                 </Link>
               </Grid>
@@ -140,6 +179,7 @@ const RegisterPage = () => {
           </Box>
         </Box>
       </Container>
+    </>
   );
 }
 export default RegisterPage;

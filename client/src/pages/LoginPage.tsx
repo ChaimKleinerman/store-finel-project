@@ -29,6 +29,7 @@ const LoginPage = () => {
             navigate(ROUTES.HOME);
         }
     }, [navigate, userInfo]);
+    
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -36,7 +37,8 @@ const LoginPage = () => {
         const password = data.get('password') || '';
         try {
             setIsLoading(true);
-            await login(email.toString(), password.toString());
+            const name = localStorage.getItem('name');
+            await login(email.toString(), password.toString(),name||'');
             setIsLoading(false);
             // sendCartToServer();
             toastSuccess('Login successful');
@@ -95,7 +97,7 @@ const LoginPage = () => {
                     {isLoading && <p>Loading...</p>}
                     <Grid container>
                         <Grid item xs>
-                            <Link href="#" variant="body2">
+                            <Link href={ROUTES.RESET} variant="body2" >
                                 Forgot password?
                             </Link>
                         </Grid>
